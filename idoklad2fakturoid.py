@@ -110,7 +110,10 @@ def convert_invoice(idoklad_invoice, fakturoid_subjects):
         'note': idoklad_invoice['ItemsTextPrefix'],
         'footer_note': idoklad_invoice['ItemsTextSuffix'],
         'private_note': idoklad_invoice['Note'],
-        'bank_account': idoklad_invoice['MyCompanyDocumentAddress']['AccountNumber'],
+        'bank_account': "/".join(
+            idoklad_invoice['MyCompanyDocumentAddress']['AccountNumber'],
+            idoklad_invoice['MyCompanyDocumentAddress']['BankNumberCode']
+        ),
         'iban': idoklad_invoice['MyCompanyDocumentAddress']['Iban'],
         'swift_bic': idoklad_invoice['MyCompanyDocumentAddress']['Swift'],
         'payment_method': make_fakturoid_payment_method(idoklad_invoice['PaymentOption']['Code']),
