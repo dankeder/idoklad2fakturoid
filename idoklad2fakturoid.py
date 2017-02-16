@@ -30,8 +30,6 @@ class FakturoidAPI(object):
 
         self.api_url = "https://app.fakturoid.cz/api/v2/accounts/{slug}".format(slug=account_name)
 
-        requests_cache.install_cache('fakturoid.cache')
-
     def get_subjects(self):
         resp = self._api_get("/subjects.json")
         if resp.status_code == 200:
