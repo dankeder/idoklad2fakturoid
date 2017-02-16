@@ -38,6 +38,24 @@ class FakturoidAPI(object):
             raise Exception(MESSAGES['request_failed'], "GET", "/subjects.json",
                     resp.status_code, resp.text)
 
+    def get_invoices(self):
+        page = 1
+        while True:
+            resp = self._api_get("/invoices.json?page={}".format(page))
+            print(page, resp.status_code)
+            if resp.status_code == 200:
+                invoices = resp.json()
+                if not invoices:
+                    return
+                for invoice in resp.json():
+                    yield invoice
+                page += 1
+            elif resp.status_code == 400:
+                return
+            else:
+                raise Exception(MESSAGES['request_failed'], "GET", "/invoices.json",
+                        resp.status_code, resp.text)
+
     def create_invoice(self, invoice):
         resp = self._api_post("/invoices.json", invoice)
         if resp.status_code == 201:
@@ -46,11 +64,22 @@ class FakturoidAPI(object):
             raise Exception(MESSAGES['request_failed'], "POST", "/invoices.json",
                     resp.status_code, resp.text)
 
+    def update_invoice(self, invoice):
+        resp = self._api_patch("/invoices/{id}.json".format(id=invoice['id']), invoice)
+        if resp.status_code == 200:
+            return resp.json()
+        else:
+            raise Exception(MESSAGES['request_failed'], "PATCH", "/invoices.json",
+                    resp.status_code, resp.text)
+
     def _api_get(self, path):
         return self.session.get(self.api_url + path)
 
     def _api_post(self, path, payload):
         return self.session.post(self.api_url + path, json=payload)
+
+    def _api_patch(self, path, payload):
+        return self.session.patch(self.api_url + path, json=payload)
 
 
 def parseargs():
